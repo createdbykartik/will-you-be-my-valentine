@@ -18,6 +18,8 @@ export default function Home() {
   const [noPosition, setNoPosition] = useState<Position>({ x: 0, y: 0 });
   const [noIsRunaway, setNoIsRunaway] = useState(false);
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   const celebrationPattern = useMemo(() => {
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240">
@@ -94,7 +96,7 @@ export default function Home() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-15 mix-blend-multiply"
           style={{
-            backgroundImage: "url('/minions.gif')",
+            backgroundImage: `url('${basePath}/minions.gif')`,
             backgroundRepeat: "repeat",
             backgroundSize: "240px 240px",
           }}
@@ -120,7 +122,7 @@ export default function Home() {
                 }}
               />
               <Image
-                src="/valentine.jpg"
+                src={`${basePath}/valentine.jpg`}
                 alt="Our valentine moment"
                 fill
                 className="object-contain"

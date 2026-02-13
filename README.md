@@ -16,6 +16,19 @@ The page supports a tiled animated background GIF at:
 
 Add any dancing GIF you have rights to (named `minions.gif`), and it will appear behind the content.
 
+## Deploy to GitHub Pages
+
+This project is configured for static export and GitHub Pages via GitHub Actions.
+
+1. Push to `main`.
+2. In GitHub: **Settings → Pages**
+	- **Build and deployment**: select **GitHub Actions**
+3. The workflow in `.github/workflows/deploy.yml` will build and deploy.
+
+Your site should be available at:
+
+`https://<your-username>.github.io/<your-repo-name>/`
+
 ## Getting Started
 
 First, run the development server:

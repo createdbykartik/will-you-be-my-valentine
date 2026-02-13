@@ -1,5 +1,21 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Valentine Image
+
+When you click **Yes**, the app shows an image loaded from:
+
+- `public/valentine.jpg`
+
+Drop your image in that path (any JPG named `valentine.jpg`).
+
+## Background GIF
+
+The page supports a tiled animated background GIF at:
+
+- `public/minions.gif`
+
+Add any dancing GIF you have rights to (named `minions.gif`), and it will appear behind the content.
+
 ## Getting Started
 
 First, run the development server:
@@ -16,7 +32,7 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

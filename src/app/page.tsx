@@ -1,64 +1,193 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+type Position = { x: number; y: number };
+
+function randomInt(minInclusive: number, maxInclusive: number) {
+  const min = Math.ceil(minInclusive);
+  const max = Math.floor(maxInclusive);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+  const noButtonRef = useRef<HTMLButtonElement | null>(null);
+  const yesButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [accepted, setAccepted] = useState(false);
+  const [noPosition, setNoPosition] = useState<Position>({ x: 0, y: 0 });
+  const [noIsRunaway, setNoIsRunaway] = useState(false);
+
+  const celebrationPattern = useMemo(() => {
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240">
+        <rect width="240" height="240" fill="white"/>
+        <text x="24" y="70" font-size="44">🐬</text>
+        <text x="140" y="110" font-size="44">🐧</text>
+        <text x="40" y="190" font-size="44">🐧</text>
+        <text x="150" y="210" font-size="44">🐬</text>
+      </svg>
+    `;
+
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  }, []);
+
+  const margin = 16;
+
+  const moveNoButton = () => {
+    const rect = noButtonRef.current?.getBoundingClientRect();
+    const buttonWidth = rect?.width ?? 140;
+    const buttonHeight = rect?.height ?? 48;
+
+    const yesRect = yesButtonRef.current?.getBoundingClientRect();
+
+    const maxX = Math.max(margin, window.innerWidth - buttonWidth - margin);
+    const maxY = Math.max(margin, window.innerHeight - buttonHeight - margin);
+
+    for (let attempt = 0; attempt < 25; attempt++) {
+      const x = randomInt(margin, maxX);
+      const y = randomInt(margin, maxY);
+
+      if (!yesRect) {
+        setNoPosition({ x, y });
+        return;
+      }
+
+      const overlapsYes = !(
+        x + buttonWidth < yesRect.left - margin ||
+        x > yesRect.right + margin ||
+        y + buttonHeight < yesRect.top - margin ||
+        y > yesRect.bottom + margin
+      );
+
+      if (!overlapsYes) {
+        setNoPosition({ x, y });
+        return;
+      }
+    }
+
+    setNoPosition({
+      x: randomInt(margin, maxX),
+      y: randomInt(margin, maxY),
+    });
+  };
+
+  useEffect(() => {
+    moveNoButton();
+
+    const handleResize = () => moveNoButton();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!noIsRunaway) return;
+    requestAnimationFrame(() => moveNoButton());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noIsRunaway]);
+
+  if (accepted) {
+    return (
+      <div className="relative min-h-screen bg-gradient-to-b from-pink-50 via-rose-50 to-amber-50 text-foreground">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-15 mix-blend-multiply"
+          style={{
+            backgroundImage: "url('/minions.gif')",
+            backgroundRepeat: "repeat",
+            backgroundSize: "240px 240px",
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+
+        <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+          <div className="text-4xl font-black tracking-tight text-red-600 sm:text-5xl">
+            LET’S GOOO 🎉
+          </div>
+          <p className="max-w-xl text-balance text-lg text-zinc-700">
+            You just made a grown adult do a little victory dance.
+          </p>
+
+          <div className="w-full overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">
+            <div className="relative aspect-[4/3] w-full">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 opacity-25"
+                style={{
+                  backgroundImage: celebrationPattern,
+                  backgroundRepeat: "repeat",
+                  backgroundSize: "240px 240px",
+                }}
+              />
+              <Image
+                src="/valentine.jpg"
+                alt="Our valentine moment"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-pink-50 to-rose-50 text-foreground">
+      <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
+        <div className="space-y-3">
+          <div className="text-2xl font-semibold text-zinc-800">Dear Sravya,</div>
+          <h1 className="text-balance text-4xl font-black tracking-tight text-red-600 sm:text-6xl">
+            Will you be my valentine?
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-balance text-base text-zinc-700 sm:text-lg">
+            Please select an option. No pressure. (There is a little pressure.)
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="flex items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={() => setAccepted(true)}
+            ref={yesButtonRef}
+            className="rounded-full bg-foreground px-7 py-3 text-base font-semibold text-background shadow-sm transition-transform active:scale-[0.98]"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Yes
+          </button>
+
+          {!noIsRunaway && (
+            <button
+              ref={noButtonRef}
+              type="button"
+              onMouseEnter={() => setNoIsRunaway(true)}
+              onPointerEnter={() => setNoIsRunaway(true)}
+              onFocus={() => setNoIsRunaway(true)}
+              className="rounded-full border border-black/15 bg-white px-7 py-3 text-base font-semibold text-zinc-800 shadow-sm"
+              aria-label="No (this button moves)"
+            >
+              No
+            </button>
+          )}
         </div>
+
+        {noIsRunaway && (
+          <button
+            ref={noButtonRef}
+            type="button"
+            onPointerEnter={moveNoButton}
+            onMouseEnter={moveNoButton}
+            onMouseMove={moveNoButton}
+            onPointerDown={moveNoButton}
+            onTouchStart={moveNoButton}
+            onFocus={moveNoButton}
+            className="fixed z-20 rounded-full border border-black/15 bg-white px-7 py-3 text-base font-semibold text-zinc-800 shadow-sm"
+            style={{ left: noPosition.x, top: noPosition.y }}
+            aria-label="No (this button moves)"
+          >
+            No
+          </button>
+        )}
       </main>
     </div>
   );
